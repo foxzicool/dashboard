@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <title>Dashboard Example</title>
+    <style>
+        .section {
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        .bg-section {
+            background-color: #e9ecef;
+        }
+        .bg-section-alt {
+            background-color: #fff;
+        }
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+        }
+        .card h5 {
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <!-- Header Cards -->
+        <div class="row text-center section bg-section-alt">
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">資產總數</h5>
+                        <p class="card-text" id="totalCount">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 border-success">
+                    <div class="card-body">
+                        <h5 class="card-title text-success">合規數</h5>
+                        <p class="card-text" id="passedCount">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 border-danger">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger">未合規數</h5>
+                        <p class="card-text" id="failedCount">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 border-secondary">
+                    <div class="card-body">
+                        <h5 class="card-title text-secondary">未稽核數</h5>
+                        <p class="card-text" id="otherCount">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compliance and Audit Overview Section -->
+        <div class="row section bg-section">
+            <div class="col-md-6">
+                <h4>資產合規率</h4>
+                <canvas id="complianceChart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <h4>近期稽核情形 (稽核資產數)</h4>
+                <canvas id="auditChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Detailed Audit Statistics -->
+        <div class="row section bg-section-alt">
+            <div class="col-md-6">
+                <h4>Recent Audit Activities</h4>
+                <canvas id="recentAuditChart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <h4>Asset Compliance Rate</h4>
+                <canvas id="assetComplianceRateChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="./js/dashboard.js"></script>
+</body>
+</html>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize card values
+    const totalCount = document.getElementById('totalCount');
+    const passedCount = document.getElementById('passedCount');
+    const failedCount = document.getElementById('failedCount');
+    const otherCount = document.getElementById('otherCount');
+
+    // Simulated data updates
+    totalCount.innerHTML = '1200';
+    passedCount.innerHTML = '800';
+    failedCount.innerHTML = '300';
+    otherCount.innerHTML = '100';
+
+    // Compliance Chart
+    const ctxCompliance = document.getElementById('complianceChart').getContext('2d');
+    const complianceChart = new Chart(ctxCompliance, {
+        type: 'doughnut',
+        data: {
+            labels: ['Passed', 'Failed', 'Other'],
+            datasets: [{
+                data: [800, 300, 100],
+                backgroundColor: ['#4caf50', '#f44336', '#ffeb3b'],
+                hoverBackgroundColor: ['#66bb6a', '#ef5350', '#fdd835']
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Compliance Status'
+            }
+        }
+    });
+
+    // Audit Activity Chart
+    const ctxAudit = document.getElementById('auditChart').getContext('2d');
+    const auditChart = new Chart(ctxAudit, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+            datasets: [{
+                label: 'Audit Count',
+                data: [50, 75, 150, 125, 225],
+                backgroundColor: '#2196f3'
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    // Recent Audit Situations Chart
+    const ctxRecentAudit = document.getElementById('recentAuditChart').getContext('2d');
+    const recentAuditChart = new Chart(ctxRecentAudit, {
+        type: 'line',
+        data: {
+            labels: ['Last 5 Days', 'Last 10 Days', 'Last 15 Days', 'Last 20 Days', 'Last 25 Days'],
+            datasets: [{
+                label: 'Number of Audits',
+                data: [20, 40, 60, 80, 100],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Recent Audit Activities'
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Asset Compliance Rate Chart
+    const ctxAssetComplianceRate = document.getElementById('assetComplianceRateChart').getContext('2d');
+    const assetComplianceRateChart = new Chart(ctxAssetComplianceRate, {
+        type: 'polarArea',
+        data: {
+            labels: ['Compliant', 'Non-Compliant', 'Unchecked'],
+            datasets: [{
+                data: [70, 20, 10],
+                backgroundColor: ['#4caf50', '#f44336', '#ffeb3b'],
+                hoverBackgroundColor: ['#66bb6a', '#ef5350', '#fdd835']
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Asset Compliance Rate'
+            }
+        }
+    });
+});
+
+</script>
